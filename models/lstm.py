@@ -16,6 +16,7 @@ class LSTM:
             _, rnn_state = self._rnn(embedding_token)
             logits = tf.layers.dense(rnn_state[1], self.n_label) 
             predict = tf.cast(tf.argmax(logits, axis=-1), tf.int32)
+
         return logits, predict
              
     def _make_embed(self, inputs):

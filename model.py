@@ -1,5 +1,4 @@
 import tensorflow as tf
-
 from models import lstm, cnn
 
 def model_fn(mode, features, labels, params):
@@ -30,6 +29,7 @@ def model_fn(mode, features, labels, params):
     
     metrics = {'accuracy': accuracy}
     tf.summary.scalar('accuracy_train', accuracy[1])
+
     
     if EVAL:
         return tf.estimator.EstimatorSpec(mode, loss=loss, eval_metric_ops=metrics)

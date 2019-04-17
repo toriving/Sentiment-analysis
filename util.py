@@ -102,3 +102,4 @@ class BestCheckpointsExporter(tf.estimator.BestExporter):
             tf.logging.info(
                 'Keeping the current best model ({} instead of {}).'.format(
                     self._best_eval_result, eval_result))
+ 
