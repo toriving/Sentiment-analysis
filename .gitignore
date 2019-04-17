@@ -1,0 +1,9 @@
+## Dongju Park's Ignore File ##
+
+# jupyter notebook files
+*/.ipynb_checkpoints/*
+.ipynb_checkpoints
+
+# pychache
+*/__pycache__/*
+*.pyc
