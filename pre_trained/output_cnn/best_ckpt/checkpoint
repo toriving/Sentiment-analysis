@@ -1,2 +1,2 @@
-model_checkpoint_path: "model.ckpt-450"
-# best 3 model :[('model.ckpt-450', 0.40962762), ('model.ckpt-420', 0.40417802), ('model.ckpt-300', 0.40145323)]
+model_checkpoint_path: "model.ckpt-570"
+# best 3 model :[('model.ckpt-570', 0.4123524), ('model.ckpt-450', 0.40236148), ('model.ckpt-420', 0.39872843)]

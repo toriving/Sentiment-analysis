@@ -91,7 +91,7 @@ def data_preprocess():
     train_str, train_label = data[0], label[0]
     dev_str, dev_label = data[1], label[1]
     test_str, test_label = data[2], label[2]
-    
+
     wtoi, itow = make_dict(train_str)
     
     train_data = dataset2idx(train_str, wtoi)

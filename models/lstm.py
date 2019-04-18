@@ -14,7 +14,7 @@ class LSTM:
         with tf.variable_scope('network'):
             embedding_token = self._make_embed(inputs)
             _, rnn_state = self._rnn(embedding_token)
-            logits = tf.layers.dense(rnn_state[1], self.n_label) 
+            logits = tf.layers.dense(rnn_state[1], self.n_label, kernel_initializer = tf.initializers.glorot_uniform) 
             predict = tf.cast(tf.argmax(logits, axis=-1), tf.int32)
 
         return logits, predict
@@ -26,7 +26,7 @@ class LSTM:
         
     def _rnn(self, inputs):
         with tf.variable_scope('rnn'):
-            cell = tf.nn.rnn_cell.LSTMCell(self.hidden_dim)
+            cell = tf.nn.rnn_cell.LSTMCell(self.hidden_dim, initializer = tf.initializers.glorot_uniform)
             cell = tf.nn.rnn_cell.DropoutWrapper(cell, input_keep_prob=self.keep_prob, output_keep_prob=self.keep_prob)
             outputs, state = tf.nn.dynamic_rnn(cell, inputs, dtype=tf.float32)
         return outputs, state

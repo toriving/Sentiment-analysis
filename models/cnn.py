@@ -26,7 +26,7 @@ class CNN:
             conv_output = tf.reshape(pooled_concat, (-1, self.num_filters * len(self.filter_size)))
             dropout_conv = tf.nn.dropout(conv_output, self.keep_prob)
 
-            logits = tf.layers.dense(dropout_conv, self.n_label)
+            logits = tf.layers.dense(dropout_conv, self.n_label, kernel_initializer = tf.initializers.glorot_uniform)
 
             predict = tf.cast(tf.argmax(logits, -1), dtype=tf.int32)
 
@@ -35,7 +35,7 @@ class CNN:
 
     def _conv2d_layer(self, inputs, filter_size):
         with tf.variable_scope("conv-%s" % filter_size):
-            conv = tf.layers.conv2d(inputs, self.num_filters, [filter_size, self.emb_dim], padding='VALID')
+            conv = tf.layers.conv2d(inputs, self.num_filters, [filter_size, self.emb_dim], padding='VALID', kernel_initializer = tf.initializers.glorot_uniform)
             conv = tf.nn.relu(conv)
             conv = tf.layers.max_pooling2d(conv, [self.max_seq_length - filter_size + 1, 1], [1, 1], padding='VALID')
 
@@ -45,3 +45,5 @@ class CNN:
         with tf.variable_scope('embedding'):
             token_embed = tf.nn.embedding_lookup(self.token_lookup, inputs)
         return token_embed
+
+    
