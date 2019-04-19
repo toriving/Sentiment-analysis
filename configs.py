@@ -1,7 +1,6 @@
 import tensorflow as tf
 
 ## Hyperparameter for CNN
-# tf.app.flags.DEFINE_string('f', '', 'kernel')
 # tf.app.flags.DEFINE_integer('batch_size', 32, 'batch size')
 # tf.app.flags.DEFINE_integer('epoch', 5, 'max epoch')
 # tf.app.flags.DEFINE_integer('train_step', 800, 'train_step')
@@ -25,7 +24,6 @@ import tensorflow as tf
 # tf.app.flags.DEFINE_string('model', 'CNN', 'select a training model')
 
 ## Hyperparameter for LSTM
-tf.app.flags.DEFINE_string('f', '', 'kernel')
 tf.app.flags.DEFINE_integer('batch_size', 32, 'batch size')
 tf.app.flags.DEFINE_integer('epoch', 5, 'max epoch')
 tf.app.flags.DEFINE_integer('train_step', 600, 'train_step')
@@ -49,7 +47,6 @@ tf.app.flags.DEFINE_bool('train', True, 'run trainig')
 tf.app.flags.DEFINE_string('model', 'LSTM', 'select a training model')
 
 ## for binary 
-# tf.app.flags.DEFINE_string('f', '', 'kernel')
 # tf.app.flags.DEFINE_integer('batch_size', 32, 'batch size')
 # tf.app.flags.DEFINE_integer('epoch', 5, 'epoch')
 # tf.app.flags.DEFINE_integer('train_step', 600, 'train_step')
@@ -72,6 +69,7 @@ tf.app.flags.DEFINE_string('model', 'LSTM', 'select a training model')
 # tf.app.flags.DEFINE_bool('train', True, 'run trainig')
 # tf.app.flags.DEFINE_string('model', 'LSTM', 'select a training model')
 
+tf.app.flags.DEFINE_string('f', '', 'kernel')
 DEFINES = tf.app.flags.FLAGS
 
 
