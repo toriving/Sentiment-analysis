@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-class CNN:
+class BILSTMCNN:
     def __init__(self, mode, params):
         self.hidden_dim = params['hidden_dim']        
         self.vocab_size = params['vocab_size']
@@ -11,8 +11,11 @@ class CNN:
         self.emb_dim = params['emb_dim']
         self.token_lookup = tf.get_variable('embedding', shape=[params['vocab_size'], params['emb_dim']], dtype=tf.float32)
         self.keep_prob = 1 - params['dropout_rate']
+        self.max_seq_length = params['max_seq_length']
+        self.d_a_size = params['d_a_size']
+        self.r_size = params['r_size']
         
-    def build(self, inputs):
+    def build(self, inputs, length):
         with tf.variable_scope('network'):
 
             embedding_token = self._make_embed(inputs)
@@ -23,10 +26,11 @@ class CNN:
                 pooled_outputs.append(self._conv2d_layer(embed_expanded, filter_size))
 
             pooled_concat = tf.concat(pooled_outputs, 3)
-            conv_output = tf.reshape(pooled_concat, (-1, self.num_filters * len(self.filter_size)))
-            dropout_conv = tf.nn.dropout(conv_output, self.keep_prob)
-
-            logits = tf.layers.dense(dropout_conv, self.n_label, kernel_initializer = tf.initializers.glorot_uniform)
+            conv_output = tf.reshape(pooled_concat, (-1, self.num_filters , len(self.filter_size)))
+            _, states = self._rnn(embedding_token, length)
+            concat_states = tf.concat([states[0].h, states[1].h], 1)
+            
+            logits = tf.layers.dense(concat_states, self.n_label, kernel_initializer = tf.initializers.glorot_uniform)
 
             predict = tf.cast(tf.argmax(logits, -1), dtype=tf.int32)
 
@@ -46,3 +50,16 @@ class CNN:
             token_embed = tf.nn.embedding_lookup(self.token_lookup, inputs)
         return token_embed
 
+    def _rnn(self, inputs, length):
+        with tf.variable_scope('rnn'):
+            with tf.variable_scope("forward"):
+                fw_cell = tf.nn.rnn_cell.LSTMCell(self.hidden_dim)
+                fw_cell = tf.nn.rnn_cell.DropoutWrapper(fw_cell, input_keep_prob=self.keep_prob, output_keep_prob=self.keep_prob)
+                
+            with tf.variable_scope("backward"):
+                bw_cell = tf.nn.rnn_cell.LSTMCell(self.hidden_dim)
+                bw_cell = tf.nn.rnn_cell.DropoutWrapper(bw_cell, input_keep_prob=self.keep_prob, output_keep_prob=self.keep_prob)
+            
+            outputs, state = tf.nn.bidirectional_dynamic_rnn(fw_cell, bw_cell, inputs, dtype=tf.float32)
+        return outputs, state
+        

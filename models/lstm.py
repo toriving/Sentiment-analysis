@@ -10,10 +10,10 @@ class LSTM:
         self.token_lookup = tf.get_variable('embedding', shape=[params['vocab_size'], params['emb_dim']], dtype=tf.float32)
         self.keep_prob = 1 - params['dropout_rate']
         
-    def build(self, inputs):
+    def build(self, inputs, length):
         with tf.variable_scope('network'):
             embedding_token = self._make_embed(inputs)
-            _, rnn_state = self._rnn(embedding_token)
+            _, rnn_state = self._rnn(embedding_token, length)
             logits = tf.layers.dense(rnn_state[1], self.n_label, kernel_initializer = tf.initializers.glorot_uniform) 
             predict = tf.cast(tf.argmax(logits, axis=-1), tf.int32)
 
@@ -24,11 +24,11 @@ class LSTM:
             token_embed = tf.nn.embedding_lookup(self.token_lookup, inputs)
         return token_embed
         
-    def _rnn(self, inputs):
+    def _rnn(self, inputs, length):
         with tf.variable_scope('rnn'):
             cell = tf.nn.rnn_cell.LSTMCell(self.hidden_dim, initializer = tf.initializers.glorot_uniform)
             cell = tf.nn.rnn_cell.DropoutWrapper(cell, input_keep_prob=self.keep_prob, output_keep_prob=self.keep_prob)
-            outputs, state = tf.nn.dynamic_rnn(cell, inputs, dtype=tf.float32)
+            outputs, state = tf.nn.dynamic_rnn(cell, inputs, dtype=tf.float32, sequence_length=length)
         return outputs, state
         
     

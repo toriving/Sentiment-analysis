@@ -7,7 +7,7 @@ from configs import DEFINES
 from util import check_and_create_path, BestCheckpointsExporter, get_params
 
 def main(self):
-    (train_data, train_label), (dev_data, dev_label), (test_data, test_label), _, _ = dp.data_preprocess()
+    (train_data, train_label, train_seq_len), (dev_data, dev_label, dev_seq_len), (test_data, test_label, test_seq_len), _, _ = dp.data_preprocess()
     params = get_params()
     
     if DEFINES.train:
@@ -24,12 +24,12 @@ def main(self):
 
         train_spec = tf.estimator.TrainSpec(
             input_fn=lambda:dp.train_input_fn(
-                train_data, train_label, DEFINES.batch_size
+                train_data, train_seq_len, train_label, DEFINES.batch_size
             ), max_steps=DEFINES.train_step)
 
         eval_spec = tf.estimator.EvalSpec(
             input_fn=lambda: dp.eval_input_fn(
-                dev_data, dev_label, len(dev_data)
+                dev_data, dev_seq_len, dev_label, len(dev_data)
             ), exporters = [BestCheckpointsExporter()], start_delay_secs=0, throttle_secs=0)
 
         tf.estimator.train_and_evaluate(estimator, train_spec, eval_spec)
@@ -48,7 +48,7 @@ def main(self):
 
     
     test_result = estimator.evaluate(input_fn=lambda: dp.eval_input_fn(
-    test_data, test_label, len(test_data)))
+    test_data, test_seq_len, test_label, len(test_data)))
     
     print('\nEVAL set accuracy: {accuracy:0.3f}\n'.format(**test_result))
 

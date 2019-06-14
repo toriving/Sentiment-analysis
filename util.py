@@ -15,7 +15,10 @@ def get_params():
         'filter_size': DEFINES.filter_size,
         'num_filters': DEFINES.num_filters,
         'dropout_rate': DEFINES.dropout_rate,
-        'model' : DEFINES.model
+        'model' : DEFINES.model,
+        'd_a_size' : DEFINES.d_a_size,
+        'r_size' : DEFINES.r_size,
+        'p_coef' : DEFINES.p_coef
     }
     return params
 

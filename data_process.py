@@ -19,25 +19,28 @@ def make_dataset(data):
     max_length = 0
     dataset = []
     label = []
+    seq_len = []
     flag = True
     
     for ds in data:
         dataset_tmp = []
         label_tmp = []
+        seq_len_tmp = []
         for d in ds:
             split_data = d.split()
             label_tmp.append(int(split_data[0]))
             text = split_data[1:]
             if max_length < len(text) and flag:
                 max_length = len(text)
-            
+            seq_len_tmp.append(len(text))
             dataset_tmp.append(text)
+        seq_len.append(seq_len_tmp)
         dataset.append(dataset_tmp)
         label.append(label_tmp)
         flag = False
         
     print('maximum length of training data : %d' %max_length)
-    return dataset, label
+    return dataset, label, seq_len
 
 def make_dict(dataset):
     wtoi = dict()
@@ -86,11 +89,11 @@ def dataset2idx(dataset, wtoi):
 def data_preprocess():
     data_origin = load_data(file_list)
     
-    data, label = make_dataset(data_origin)
+    data, label, seq_len = make_dataset(data_origin)
     
-    train_str, train_label = data[0], label[0]
-    dev_str, dev_label = data[1], label[1]
-    test_str, test_label = data[2], label[2]
+    train_str, train_label, train_seq_len = data[0], label[0], seq_len[0]
+    dev_str, dev_label, dev_seq_len = data[1], label[1], seq_len[1]
+    test_str, test_label, test_seq_len = data[2], label[2], seq_len[2]
 
     wtoi, itow = make_dict(train_str)
     
@@ -98,16 +101,16 @@ def data_preprocess():
     dev_data = dataset2idx(dev_str, wtoi)
     test_data = dataset2idx(test_str, wtoi)
     
-    return (train_data, train_label), (dev_data, dev_label), (test_data, test_label), wtoi, itow
+    return (train_data, train_label, train_seq_len), (dev_data, dev_label, dev_seq_len), (test_data, test_label, test_seq_len), wtoi, itow
 
 
-def rearrange(inputs, label):
-    features = {"inputs": inputs}
+def rearrange(inputs, length, label):
+    features = {"inputs": inputs, "length": length}
     return features, label
 
 
-def train_input_fn(train_input, train_label, batch_size):
-    dataset = tf.data.Dataset.from_tensor_slices((train_input, train_label))
+def train_input_fn(train_input, train_seq_len, train_label, batch_size):
+    dataset = tf.data.Dataset.from_tensor_slices((train_input, train_seq_len, train_label))
     dataset = dataset.shuffle(buffer_size=len(train_input))
     
     assert batch_size is not None, "train batchSize must not be None"
@@ -120,8 +123,8 @@ def train_input_fn(train_input, train_label, batch_size):
     return iterator.get_next()
 
 
-def eval_input_fn(eval_input, eval_label, batch_size):
-    dataset = tf.data.Dataset.from_tensor_slices((eval_input, eval_label))
+def eval_input_fn(eval_input, eval_seq_len, eval_label, batch_size):
+    dataset = tf.data.Dataset.from_tensor_slices((eval_input, eval_seq_len, eval_label))
     dataset = dataset.shuffle(buffer_size=len(eval_input))
     assert batch_size is not None, "eval batchSize must not be None"
     
